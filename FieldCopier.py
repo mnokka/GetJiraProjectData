@@ -106,6 +106,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
     JQLQuery="project=NRP"  # TODO: ARGUMENT
 
     i=1      
+    SKIP=0
     for issue in jira.search_issues(JQLQuery, maxResults=10):
 
                 #TODO:BUG: if more than one match will fail
@@ -122,16 +123,20 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 logging.debug("Source custom field value: {0}".format(SourceCustomField))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
                 if (SourceCustomField is None):
-                    logging.debug("*** No source custom field value  ****")
+                    logging.debug("*** No source custom field value . Skipping copy operation ****")
+                    SKIP=1
+                else:
+                    SKIP=0
+                    logging.debug("{0}: Going to copy {1} ----> {2}".format(i,SourceCustomField,TargetCustomField))
                 if (TargetCustomField is None):
                     logging.debug("*** No target custom field value  ****")    
                     
                
-                logging.debug("{0}: Going to copy {1} ----> {2}".format(i,SourceCustomField,TargetCustomField))
+                
              
                 #issue.update(customfield_10019=DrawingNumber   , single test field)
                 
-                SKIP=1
+                
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
                     try:
