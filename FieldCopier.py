@@ -53,8 +53,8 @@ def main(argv):
     
     USAGE:
     ---password | -w <JIRA password>
-    --service   | -n <JIRA service>
-    --user   | -n <JIRA user>
+    --service   | -s <JIRA service>
+    --user   | -u <JIRA user>
 
     """.format(__version__,sys.argv[0]))
 
@@ -76,14 +76,13 @@ def main(argv):
     #filepath = args.filepath or ''
     
     JIRASERVICE = args.service or ''
-    JIRAPROJECT = args.project or ''
     PSWD= args.password or ''
     USER= args.user or ''
     #RENAME= args.rename or ''
     #ASCII=args.ascii or ''
     
     # quick old-school way to check needed parameters
-    if (JIRASERVICE=='' or  JIRAPROJECT==''  or PSWD=='' or USER=='' ):
+    if (JIRASERVICE=='' or  PSWD=='' or USER=='' ):
         parser.print_help()
         sys.exit(2)
         
@@ -134,7 +133,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 
                 SKIP=1
                 if (SKIP==0):
-                    sys.exit(5)  #to be sure not to doit first time
+                    #sys.exit(5)  #to be sure not to doit first time
                     try:
                         #issue.update(fields={SourceCustomField: TargetCustomField})  #TODO:ARGUMENT
                         logging.debug("try phase")
