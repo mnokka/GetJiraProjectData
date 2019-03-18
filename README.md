@@ -1,2 +1,4 @@
 # ChangeJiraIssueFieldType
-Change Jira issue field type from int to string
+Actually, copy custom field1 (source) values to custom field2 (target)
+
+The source custom field and target custom field must exist in system (normally target is empty and waits for this copying)
