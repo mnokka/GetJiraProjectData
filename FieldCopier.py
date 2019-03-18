@@ -118,10 +118,12 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 # Change these according the need, or add as program arguments
                 SourceCustomField=issue.fields.customfield_14204  #TODO:ARGUMENT
                 TargetCustomField=issue.fields.customfield_14350  #TODO:ARGUMENT  
-               
+                SourceCustomFieldString="customfield_14204"
                 
                 logging.debug("Source custom field value: {0}".format(SourceCustomField))
+                logging.debug("Source custom field ID string: {0}".format(SourceCustomFieldString))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
+                
                 if (SourceCustomField is None):
                     logging.debug("*** No source custom field value . Skipping copy operation ****")
                     SKIP=1
@@ -140,8 +142,8 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
                     try:
-                        #issue.update(fields={SourceCustomField: TargetCustomField})  #TODO:ARGUMENT
-                        logging.debug("try phase")
+                        issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
+                        logging.debug("*** Copy operation done***")
                     except JIRAError as e: 
                         logging.debug(" ********** JIRA ERROR DETECTED: ***********")
                         logging.debug(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))
