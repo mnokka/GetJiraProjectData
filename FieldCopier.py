@@ -103,11 +103,11 @@ def main(argv):
 def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
 
     # Change these according the need, or add as program arguments
-    JQLQuery="project=NRP"  # TODO: ARGUMENT
+    JQLQuery="project=RMT1400"  # TODO: ARGUMENT
 
     i=1      
     SKIP=0
-    for issue in jira.search_issues(JQLQuery, maxResults=10):
+    for issue in jira.search_issues(JQLQuery, maxResults=200):
 
                 #TODO:BUG: if more than one match will fail
                 myissuekey=format(issue.key)
@@ -118,10 +118,10 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 # Change these according the need, or add as program arguments
                 SourceCustomField=issue.fields.customfield_14204  #TODO:ARGUMENT
                 TargetCustomField=issue.fields.customfield_14350  #TODO:ARGUMENT  
-                SourceCustomFieldString="customfield_14204"
+                TargetCustomFieldString="customfield_14350"
                 
                 logging.debug("Source custom field value: {0}".format(SourceCustomField))
-                logging.debug("Source custom field ID string: {0}".format(SourceCustomFieldString))
+                logging.debug("Target custom field ID string: {0}".format(TargetCustomFieldString))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
                 
                 if (SourceCustomField is None):
@@ -129,7 +129,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                     SKIP=1
                 else:
                     SKIP=0
-                    logging.debug("{0}: Going to copy {1} ----> {2}".format(i,SourceCustomField,TargetCustomField))
+                    logging.debug("{0}: Going to copy {1} ----> {2}".format(i,str(int(SourceCustomField)),TargetCustomFieldString))
                 if (TargetCustomField is None):
                     logging.debug("*** No target custom field value  ****")    
                     
@@ -142,7 +142,8 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
                     try:
-                        issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
+                        #issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
+                        issue.update(fields={TargetCustomFieldString: str(int(SourceCustomField))})  #TODO:ARGUMENT
                         logging.debug("*** Copy operation done***")
                     except JIRAError as e: 
                         logging.debug(" ********** JIRA ERROR DETECTED: ***********")
