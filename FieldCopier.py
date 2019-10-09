@@ -3,10 +3,13 @@
 # 9.10.2019 mika.nokka1@gmail.com 
 # 
 # NOTE: For this POC removed .netrc authetication, using pure arguments
-# JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
+# 
+#JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
+# SKIP variable for possible dry run
+# Target date picker custom field incoded
+# 
 #
-# Target date picker ustom field in code
-# TargetCustomField=issue.fields.customfield_10019  #TODO:ARGUMENT 
+# Python V2
 #
 #from __future__ import unicode_literals
 
@@ -54,6 +57,9 @@ def main(argv):
     ---password | -w <JIRA password>
     --service   | -s <JIRA service>
     --user   | -u <JIRA user>
+
+    Change project ID, target date picker ID in code
+    (use SKIP variable for dry run)
 
     """.format(__version__,sys.argv[0]))
 
@@ -105,7 +111,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
     JQLQuery="project=MIG"  # TODO: ARGUMENT
 
     i=1      
-    SKIP=0
+    SKIP=0 # DRYRUN=1 , real operation =0
     for issue in jira.search_issues(JQLQuery, maxResults=200):
 
                 #TODO:BUG: if more than one match will fail
@@ -124,20 +130,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 logging.debug("Target custom field ID string: {0}".format(TargetCustomFieldString))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
                 
-                #if (SourceCustomField is None):
-                #    logging.debug("*** No source custom field value . Skipping copy operation ****")
-                #    SKIP=1
-                #else:
-                #    SKIP=0
-                #logging.debug("{0}: Going to copy  ----> {2}".format(i,str(int(SourceCustomField)),TargetCustomFieldString))
-                #if (TargetCustomField is None):
-                #    logging.debug("*** No target custom field value  ****")    
-                    
-               
-                
-             
-                #issue.update(customfield_10019=DrawingNumber   , single test field)
-                
+       
                 
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
@@ -145,6 +138,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                         #issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
                         issue.update(fields={TargetCustomFieldString: SourceFieldValue})  #TODO:ARGUMENT
                         logging.debug("*** Copy operation done***")
+                        time.sleep(0.7) # prevent jira crashing for script attack
                     except JIRAError as e: 
                         logging.debug(" ********** JIRA ERROR DETECTED: ***********")
                         logging.debug(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))

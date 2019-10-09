@@ -1,12 +1,14 @@
 # JiraCreatedDateCopier
 
-POC to investigate whether following is possible:
 
-Copy issue created date to date picker custom field 
 
-Target custom field must exist in system (normally target is empty and waits for this copying)
+Copy issue created date to date picker custom field for safe keeping
 
-NOTE: JQL query for issues target field's IDs defined in code
+
+NOTE: Due quick POC nature following are defined in code
+ 1) Target project
+ 2) Target Date picker custom field ID. Must exists in target Jira
+ 3) SKIP variable for possible dry run
 
 
 
