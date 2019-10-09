@@ -1,12 +1,11 @@
 # Used to copy values from one custom field to another
 #
-# 18.3.2019 mika.nokka1@gmail.com 
+# 9.10.2019 mika.nokka1@gmail.com 
 # 
 # NOTE: For this POC removed .netrc authetication, using pure arguments
-# JQL query for chosen isseus: JQLQuery="project=NRP"  (incode)
+# JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
 #
-# Source and custom field in code
-# SourceCustomField=issue.fields.customfield_10019  #TODO:ARGUMENT
+# Target date picker ustom field in code
 # TargetCustomField=issue.fields.customfield_10019  #TODO:ARGUMENT 
 #
 #from __future__ import unicode_literals
@@ -45,7 +44,7 @@ def main(argv):
     PSWD=u''
     USER=u''
   
-    logging.debug (u"--Custom field copier starting --") 
+    logging.debug (u"--Created date field copier starting --") 
 
  
     parser = argparse.ArgumentParser(usage="""
@@ -106,7 +105,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
     JQLQuery="project=RMT1400"  # TODO: ARGUMENT
 
     i=1      
-    SKIP=0
+    SKIP=1
     for issue in jira.search_issues(JQLQuery, maxResults=200):
 
                 #TODO:BUG: if more than one match will fail
@@ -116,11 +115,12 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 #logging.debug("ID{0}: ".format(issue.id))
 
                 # Change these according the need, or add as program arguments
-                SourceCustomField=issue.fields.customfield_14204  #TODO:ARGUMENT
-                TargetCustomField=issue.fields.customfield_14350  #TODO:ARGUMENT  
-                TargetCustomFieldString="customfield_14350"
+                TargetCustomField=issue.fields.customfield_14705  #TODO:ARGUMENT  
+                TargetCustomFieldString="customfield_14705"
+                SourceFieldValue=issue.fields.created
                 
-                logging.debug("Source custom field value: {0}".format(SourceCustomField))
+                #issue.fields.created
+                logging.debug("Source created date field value: {0}".format(SourceFieldValue))
                 logging.debug("Target custom field ID string: {0}".format(TargetCustomFieldString))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
                 
@@ -140,7 +140,7 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 
                 
                 if (SKIP==0):
-                    #sys.exit(5)  #to be sure not to doit first time
+                    sys.exit(5)  #to be sure not to doit first time
                     try:
                         #issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
                         issue.update(fields={TargetCustomFieldString: str(int(SourceCustomField))})  #TODO:ARGUMENT
@@ -152,7 +152,8 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                     else: 
                         logging.debug("All OK")
                     #sys.exit(5)
-                
+                else
+                    loggin.debug("SKIPPED ACTIONS. DRYRUN ONLY")
                 
                 i=i+1
                 logging.debug("---------------------------------------------------------------")

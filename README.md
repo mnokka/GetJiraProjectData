@@ -1,12 +1,14 @@
-# JiraFieldCopier
+# JiraCreatedDateCopier
 
-Copy custom field1 (source) values to custom field2 (target)
+POC to investigate whether following is possible:
 
-The source custom field and target custom field must exist in system (normally target is empty and waits for this copying)
+Copy issue created date to date picker custom field 
 
-NOTE: JQL query for issues and source and target field's IDs defined in code
+Target custom field must exist in system (normally target is empty and waits for this copying)
 
-NOTE: This example copies values from int field --> string field
+NOTE: JQL query for issues target field's IDs defined in code
+
+
 
 
 USAGE:
@@ -21,4 +23,4 @@ FieldCopier.py -s https://THEJIRA.COM -u USER -w PASSWORD
    --user   | -u <JIRA user>
 
 
-NOTE: Before inhouse tool usage, one might first check if ScriptRunner supports wished field->field conversion.  (https://scriptrunner.adaptavist.com/latest/jira/builtin-scripts.html#_copy_custom_field_values ) . 
+  
