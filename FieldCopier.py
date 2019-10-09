@@ -10,7 +10,7 @@
 #
 #from __future__ import unicode_literals
 
-import openpyxl 
+#import openpyxl 
 import sys, logging
 import argparse
 #import re
@@ -69,7 +69,7 @@ def main(argv):
     args = parser.parse_args()
     
     if args.version:
-        print 'Tool version: %s'  % __version__
+        print ("Tool . version: %s"  % __version__)
         sys.exit(2)    
            
     #filepath = args.filepath or ''
@@ -102,10 +102,10 @@ def main(argv):
 def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
 
     # Change these according the need, or add as program arguments
-    JQLQuery="project=RMT1400"  # TODO: ARGUMENT
+    JQLQuery="project=MIG"  # TODO: ARGUMENT
 
     i=1      
-    SKIP=1
+    SKIP=0
     for issue in jira.search_issues(JQLQuery, maxResults=200):
 
                 #TODO:BUG: if more than one match will fail
@@ -124,14 +124,14 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 logging.debug("Target custom field ID string: {0}".format(TargetCustomFieldString))
                 logging.debug("Target custom field value: {0}".format(TargetCustomField))
                 
-                if (SourceCustomField is None):
-                    logging.debug("*** No source custom field value . Skipping copy operation ****")
-                    SKIP=1
-                else:
-                    SKIP=0
-                    logging.debug("{0}: Going to copy {1} ----> {2}".format(i,str(int(SourceCustomField)),TargetCustomFieldString))
-                if (TargetCustomField is None):
-                    logging.debug("*** No target custom field value  ****")    
+                #if (SourceCustomField is None):
+                #    logging.debug("*** No source custom field value . Skipping copy operation ****")
+                #    SKIP=1
+                #else:
+                #    SKIP=0
+                #logging.debug("{0}: Going to copy  ----> {2}".format(i,str(int(SourceCustomField)),TargetCustomFieldString))
+                #if (TargetCustomField is None):
+                #    logging.debug("*** No target custom field value  ****")    
                     
                
                 
@@ -140,10 +140,10 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 
                 
                 if (SKIP==0):
-                    sys.exit(5)  #to be sure not to doit first time
+                    #sys.exit(5)  #to be sure not to doit first time
                     try:
                         #issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
-                        issue.update(fields={TargetCustomFieldString: str(int(SourceCustomField))})  #TODO:ARGUMENT
+                        issue.update(fields={TargetCustomFieldString: SourceFieldValue})  #TODO:ARGUMENT
                         logging.debug("*** Copy operation done***")
                     except JIRAError as e: 
                         logging.debug(" ********** JIRA ERROR DETECTED: ***********")
@@ -152,8 +152,8 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                     else: 
                         logging.debug("All OK")
                     #sys.exit(5)
-                else
-                    loggin.debug("SKIPPED ACTIONS. DRYRUN ONLY")
+                else:
+                    logging.debug("SKIPPED ACTIONS. DRYRUN ONLY")
                 
                 i=i+1
                 logging.debug("---------------------------------------------------------------")
@@ -165,10 +165,10 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
         
     end = time.clock()
     totaltime=end-start
-    print "Time taken:{0} seconds".format(totaltime)
+    print ("Time taken:{0} seconds".format(totaltime))
        
             
-    print "*************************************************************************"
+    print ("*************************************************************************")
         
 
  
