@@ -119,20 +119,24 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 logging.debug("Jira issue key (from Jira): {0}".format(myissuekey))
                 #logging.debug("ISSUE: {0}:".format(issue))
                 #logging.debug("ID{0}: ".format(issue.id))
-                logging.debug("Jira issue field data (from Jira): {0}".format(issue.fields))
+                #logging.debug("Jira issue field data (from Jira): {0}".format(issue.fields))
          
-                for field_name in issue.raw['fields']:
+                #for field_name in issue.raw['fields']:
                    # print "Field:", field_name, "Value:", issue.raw['fields'][field_name]
                    #logging.debug("field nanme: {0}".format(field_name))
                 
                    
                    
-                   value=issue.raw['fields'][field_name]
-                   if (str(value) != "None"):
-                       logging.debug("field: {0} Value: {1} ".format(field_name,value))
+                #   value=issue.raw['fields'][field_name]
+                #   if (str(value) != "None"):
+                #       logging.debug("field: {0} Value: {1} ".format(field_name,value))
                 
                 for attachment in issue.fields.attachment:
-                     print("Name: '{filename}', size: {size}".format(filename=attachment.filename, size=attachment.size))
+                     print("Attahcment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
+                     image = attachment.get()    
+                     jira_filename = attachment.filename    
+                     with open(jira_filename, 'wb') as f:        
+                         f.write(image) 
                 
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time

@@ -2,7 +2,7 @@
 #
 # 26.9.2018  mika.nokka1@gmail.com
 # 
-# To be used via importing only!!!!
+# To be used via importing only
 # 
 
 import datetime 
