@@ -1,12 +1,12 @@
-# Used to copy values from one custom field to another
+# Used to copy given Jira project data to local drive
 #
-# 9.10.2019 mika.nokka1@gmail.com 
+# 21.11.2019 mika.nokka1@gmail.com 
 # 
-# NOTE: For this POC removed .netrc authetication, using pure arguments
+# NOTES:
+# 1) For this POC removed .netrc authetication, using pure arguments
+# 2) JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
+# 3) SKIP variable for possible dry run
 # 
-#JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
-# SKIP variable for possible dry run
-# Target date picker custom field incoded
 # 
 #
 # Python V2
@@ -108,29 +108,31 @@ def main(argv):
 def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
 
     # Change these according the need, or add as program arguments
-    JQLQuery="project=MIG"  # TODO: ARGUMENT
+    JQLQuery="project=TOP and attachments is NOT EMPTY"  # TODO: AS AN ARGUMENT
 
     i=1      
-    SKIP=0 # DRYRUN=1 , real operation =0
-    for issue in jira.search_issues(JQLQuery, maxResults=200):
+    SKIP=1 # DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
+    for issue in jira.search_issues(JQLQuery, fields="attachment", maxResults=200): # TODO: MAX ISSUE AN AN ARGUMENT
 
                 #TODO:BUG: if more than one match will fail
                 myissuekey=format(issue.key)
                 logging.debug("Jira issue key (from Jira): {0}".format(myissuekey))
                 #logging.debug("ISSUE: {0}:".format(issue))
                 #logging.debug("ID{0}: ".format(issue.id))
-
-                # Change these according the need, or add as program arguments
-                TargetCustomField=issue.fields.customfield_14705  #TODO:ARGUMENT  
-                TargetCustomFieldString="customfield_14705"
-                SourceFieldValue=issue.fields.created
+                logging.debug("Jira issue field data (from Jira): {0}".format(issue.fields))
+         
+                for field_name in issue.raw['fields']:
+                   # print "Field:", field_name, "Value:", issue.raw['fields'][field_name]
+                   #logging.debug("field nanme: {0}".format(field_name))
                 
-                #issue.fields.created
-                logging.debug("Source created date field value: {0}".format(SourceFieldValue))
-                logging.debug("Target custom field ID string: {0}".format(TargetCustomFieldString))
-                logging.debug("Target custom field value: {0}".format(TargetCustomField))
+                   
+                   
+                   value=issue.raw['fields'][field_name]
+                   if (str(value) != "None"):
+                       logging.debug("field: {0} Value: {1} ".format(field_name,value))
                 
-       
+                for attachment in issue.fields.attachment:
+                     print("Name: '{filename}', size: {size}".format(filename=attachment.filename, size=attachment.size))
                 
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
