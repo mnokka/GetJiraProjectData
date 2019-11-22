@@ -50,44 +50,48 @@ def main(argv):
     logging.debug (u"--Created date field copier starting --") 
 
  
-    parser = argparse.ArgumentParser(usage="""
-    {1}    Version:{0}     -  mika.nokka1@gmail.com
+    parser = argparse.ArgumentParser(description=" Copy Jira JQL result issues attachments to given directory",
     
-    USAGE:
-    ---password | -w <JIRA password>
-    --service   | -s <JIRA service>
-    --user   | -u <JIRA user>
+    
+    epilog=" --TBD--- "
 
-    Change project ID, target date picker ID in code
-    (use SKIP variable for dry run)
-
-    """.format(__version__,sys.argv[0]))
-
+    
+    )
+    
    
-    parser.add_argument('-v','--version', help='<Version>', action='store_true')
+
+    #parser = argparse.ArgumentParser(description="Copy Jira JQL result issues' attachments to given directory")
     
-    parser.add_argument('-w','--password', help='<JIRA password>')
-    parser.add_argument('-u','--user', help='<JIRA user>')
-    parser.add_argument('-s','--service', help='<JIRA service>')
+    #parser = argparse.ArgumentParser(epilog=" not displayed ") # TODO: not working
+    
+    parser.add_argument('-v', help='Show version&author and exit', action='version',version="Version:{0}   mika.nokka1@gmail.com ,  MIT licenced ".format(__version__) )
+    
+    parser.add_argument("-w",help='<JIRA password>',metavar="password")
+    parser.add_argument('-u', help='<JIRA user account>',metavar="user")
+    parser.add_argument('-s', help='<JIRA service>',metavar="server_address")
+    parser.add_argument('-d', help='<Target directory path for attachements download>',metavar="dirpath")
+    parser.add_argument('-q', help='<JIRA JQL query for issues>',metavar="JQLquery")
+    parser.add_argument('-r', help='<DryRun - do nothing>')
     #parser.add_argument('-p','--project', help='<JIRA project>')
  
-        
+
     args = parser.parse_args()
     
-    if args.version:
-        print ("Tool . version: %s"  % __version__)
-        sys.exit(2)    
+    #if args.version:
+    #    print ("Tool . version: %s"  % __version__)
+    #    sys.exit(2)    
            
     #filepath = args.filepath or ''
     
-    JIRASERVICE = args.service or ''
-    PSWD= args.password or ''
-    USER= args.user or ''
+    JIRASERVICE = args.s or ''
+    PSWD= args.w or ''
+    USER= args.u or ''
     #RENAME= args.rename or ''
     #ASCII=args.ascii or ''
     
     # quick old-school way to check needed parameters
     if (JIRASERVICE=='' or  PSWD=='' or USER=='' ):
+        logging.error("\n---> MISSING ARGUMENTS!!\n ")
         parser.print_help()
         sys.exit(2)
         
