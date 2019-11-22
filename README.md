@@ -36,3 +36,5 @@ GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP 
 
 GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP and attachments is NOT EMPTY" -d .
   
+
+Python V2
