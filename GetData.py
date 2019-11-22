@@ -53,7 +53,11 @@ def main(argv):
     parser = argparse.ArgumentParser(description=" Copy Jira JQL result issues attachments to given directory",
     
     
-    epilog=" --TBD--- "
+    epilog="""
+    
+    EXAMPLE:
+    
+    GetData.py  -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q \"project=TOP and attachments is NOT EMPTY\" -d TMPDIR"""
 
     
     )
@@ -69,28 +73,27 @@ def main(argv):
     parser.add_argument("-w",help='<JIRA password>',metavar="password")
     parser.add_argument('-u', help='<JIRA user account>',metavar="user")
     parser.add_argument('-s', help='<JIRA service>',metavar="server_address")
-    parser.add_argument('-d', help='<Target directory path for attachements download>',metavar="dirpath")
+    parser.add_argument('-d', help='<Path for attachements downloading>, . by default',metavar="dirpath",default=".\\")
     parser.add_argument('-q', help='<JIRA JQL query for issues>',metavar="JQLquery")
-    parser.add_argument('-r', help='<DryRun - do nothing>')
-    #parser.add_argument('-p','--project', help='<JIRA project>')
+    parser.add_argument('-r', help='<DryRun - do nothing but emulate. Off by default>',metavar="on|off",default="off")
  
 
     args = parser.parse_args()
-    
-    #if args.version:
-    #    print ("Tool . version: %s"  % __version__)
-    #    sys.exit(2)    
-           
-    #filepath = args.filepath or ''
-    
+       
     JIRASERVICE = args.s or ''
     PSWD= args.w or ''
     USER= args.u or ''
-    #RENAME= args.rename or ''
-    #ASCII=args.ascii or ''
+    JQL=args.q or ''
+    if (args.r=="on"):
+         SKIP=1
+    else:
+        SKIP=0    
+    DIR=args.d
+    #logging.info("DIR:{0}".format(DIR))
+    #logging.info("SKIP:{0}".format(SKIP))
     
     # quick old-school way to check needed parameters
-    if (JIRASERVICE=='' or  PSWD=='' or USER=='' ):
+    if (JIRASERVICE=='' or  PSWD=='' or USER=='' or JQL==''):
         logging.error("\n---> MISSING ARGUMENTS!!\n ")
         parser.print_help()
         sys.exit(2)
@@ -99,7 +102,7 @@ def main(argv):
     Authenticate(JIRASERVICE,PSWD,USER)
     jira=DoJIRAStuff(USER,PSWD,JIRASERVICE)
     
-    Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira)
+    Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR)
 
 
 
@@ -109,39 +112,45 @@ def main(argv):
 
 #NOTE: Uses hardcoded sheet/column value
 
-def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
+def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
 
     # Change these according the need, or add as program arguments
-    JIRAPROJECT="TOP"
-    JQLQuery="project=TOP and attachments is NOT EMPTY"  # TODO: AS AN ARGUMENT 
+ 
+    #JQLQuery="project=TOP and attachments is NOT EMPTY"  # TODO: AS AN ARGUMENT 
+   
 
     i=1      
-    SKIP=1 # DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
-    for issue in jira.search_issues(JQLQuery, fields="attachment", maxResults=200): # TODO: MAX ISSUE AN AN ARGUMENT
+    #SKIP --> DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
+    try:
+        for issue in jira.search_issues(JQL, fields="attachment", maxResults=200): # TODO: MAX ISSUE AN AN ARGUMENT
 
-                logging.info("...................................................................................")
+                logging.info("....... COUNTER:{0}...................................................................................".format(i))
                 #TODO:BUG: if more than one match will fail
                 myissuekey=format(issue.key)
-                logging.info("Jira project: {0}  Issue:{1}".format(JIRAPROJECT,myissuekey))
+                logging.info("Jira issue:{0}".format(myissuekey))
+                
+                # TODO: IF field info is needed to find out
                 #logging.debug("ISSUE: {0}:".format(issue))
                 #logging.debug("ID{0}: ".format(issue.id))
                 #logging.debug("Jira issue field data (from Jira): {0}".format(issue.fields))
-         
                 #for field_name in issue.raw['fields']:
                    # print "Field:", field_name, "Value:", issue.raw['fields'][field_name]
                    #logging.debug("field nanme: {0}".format(field_name))
-                
-                   
-                   
                 #   value=issue.raw['fields'][field_name]
                 #   if (str(value) != "None"):
                 #       logging.debug("field: {0} Value: {1} ".format(field_name,value))
                 
                 
                 KEY=str(issue.key)
+                path=os.path.join(DIR,KEY)
+                #logging.info("--> path:{0}".format(path))
+           
                 # Create target Directory if don't exist
-                if not os.path.exists(KEY):
-                    os.mkdir(KEY)
+                if not os.path.exists(path=os.path.join(DIR,KEY)):
+                    if (SKIP==0):
+                        os.mkdir(path)
+                    else:
+                        logging.info("!!! SIMULATED EXECUTION ONLY!!!")
                     logging.info("Created directory:{0}".format(KEY))
                 else:    
                     logging.info("Directory:{0} exists. DID NOTHING".format(KEY))
@@ -150,34 +159,23 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                      logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
                      item = attachment.get()    
                      jira_filename = attachment.filename   
-                     path=os.path.join(KEY,jira_filename) 
-                     logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename))
-                     with open(path, 'w') as file:        
-                         file.write(item) 
-                
-                if (SKIP==0):
-                    #sys.exit(5)  #to be sure not to doit first time
-                    try:
-                        #issue.update(fields={SourceCustomFieldString: int(TargetCustomField)})  #TODO:ARGUMENT
-                        issue.update(fields={TargetCustomFieldString: SourceFieldValue})  #TODO:ARGUMENT
-                        logging.debug("*** Copy operation done***")
-                        time.sleep(0.7) # prevent jira crashing for script attack
-                    except JIRAError as e: 
-                        logging.debug(" ********** JIRA ERROR DETECTED: ***********")
-                        logging.debug(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))
-                    #sys.exit(5) 
-                    else: 
-                        logging.debug("All OK")
-                    #sys.exit(5)
-                else:
-                    logging.debug("SKIPPED ACTIONS. DRYRUN ONLY")
+                     path=os.path.join(DIR,KEY,jira_filename) 
+                     
+                     if (SKIP==0):
+                         with open(path, 'w') as file:        
+                             file.write(item) 
+                     else:
+                        logging.info("!!! SIMULATED EXECUTION ONLY!!!")
+                     logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename)) 
                 
                 i=i+1
                 logging.debug("---------------------------------------------------------------")
-
-
-    
-    
+    except JIRAError as e: 
+        logging.error(" ********** JIRA ERROR DETECTED: ***********")
+        logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))
+        logging.error(" ********** Maybe it's the JQL query:  {0}".format(JQL))
+    else:
+        logging.info("All OK")
   
         
     end = time.clock()
