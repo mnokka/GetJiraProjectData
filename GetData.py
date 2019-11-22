@@ -122,7 +122,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
     i=1      
     #SKIP --> DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
     try:
-        for issue in jira.search_issues(JQL, fields="attachment", maxResults=200): # TODO: MAX ISSUE AN AN ARGUMENT
+        for issue in jira.search_issues(JQL, fields="attachment", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
 
                 logging.info("....... COUNTER:{0}...................................................................................".format(i))
                 #TODO:BUG: if more than one match will fail
@@ -162,7 +162,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                      path=os.path.join(DIR,KEY,jira_filename) 
                      
                      if (SKIP==0):
-                         with open(path, 'w') as file:        
+                         with open(path, 'wb') as file:        
                              file.write(item) 
                      else:
                         logging.info("!!! SIMULATED EXECUTION ONLY!!!")
