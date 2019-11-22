@@ -36,7 +36,7 @@ __version__ = u"0.1"
 #ENV="demo"
 ENV=u"PROD"
 
-logging.basicConfig(level=logging.DEBUG) # IF calling from Groovy, this must be set logging level DEBUG in Groovy side order these to be written out
+logging.basicConfig(level=logging.INFO) # IF calling from Groovy, this must be set logging level DEBUG in Groovy side order these to be written out
 
 
 
@@ -108,15 +108,17 @@ def main(argv):
 def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
 
     # Change these according the need, or add as program arguments
-    JQLQuery="project=TOP and attachments is NOT EMPTY"  # TODO: AS AN ARGUMENT
+    JIRAPROJECT="TOP"
+    JQLQuery="project=TOP and attachments is NOT EMPTY"  # TODO: AS AN ARGUMENT 
 
     i=1      
     SKIP=1 # DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
     for issue in jira.search_issues(JQLQuery, fields="attachment", maxResults=200): # TODO: MAX ISSUE AN AN ARGUMENT
 
+                logging.info("...................................................................................")
                 #TODO:BUG: if more than one match will fail
                 myissuekey=format(issue.key)
-                logging.debug("Jira issue key (from Jira): {0}".format(myissuekey))
+                logging.info("Jira project: {0}  Issue:{1}".format(JIRAPROJECT,myissuekey))
                 #logging.debug("ISSUE: {0}:".format(issue))
                 #logging.debug("ID{0}: ".format(issue.id))
                 #logging.debug("Jira issue field data (from Jira): {0}".format(issue.fields))
@@ -131,12 +133,23 @@ def Parse(JIRASERVICE,JIRAPROJECT,PSWD,USER,ENV,jira):
                 #   if (str(value) != "None"):
                 #       logging.debug("field: {0} Value: {1} ".format(field_name,value))
                 
+                
+                KEY=str(issue.key)
+                # Create target Directory if don't exist
+                if not os.path.exists(KEY):
+                    os.mkdir(KEY)
+                    logging.info("Created directory:{0}".format(KEY))
+                else:    
+                    logging.info("Directory:{0} exists. DID NOTHING".format(KEY))
+                
                 for attachment in issue.fields.attachment:
-                     print("Attahcment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
-                     image = attachment.get()    
-                     jira_filename = attachment.filename    
-                     with open(jira_filename, 'wb') as f:        
-                         f.write(image) 
+                     logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
+                     item = attachment.get()    
+                     jira_filename = attachment.filename   
+                     path=os.path.join(KEY,jira_filename) 
+                     logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename))
+                     with open(path, 'w') as file:        
+                         file.write(item) 
                 
                 if (SKIP==0):
                     #sys.exit(5)  #to be sure not to doit first time
