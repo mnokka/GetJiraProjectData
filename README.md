@@ -14,7 +14,7 @@ Traps error cases
 
 
 
-##USAGE:
+## USAGE:
 
   -h, --help         show this help message and exit
   
@@ -35,7 +35,7 @@ Traps error cases
   
   
 
-##EXAMPLES:
+## EXAMPLES:
 
 
 GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP and attachments is NOT EMPTY" -d TMPDIR\ZZZ
