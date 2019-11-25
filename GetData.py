@@ -4,9 +4,8 @@
 # 
 # NOTES:
 # 1) For this POC removed .netrc authetication, using pure arguments
-# 2) JQL query for chosen isseus: JQLQuery="project=xxxxx"  (incoded)
-# 3) SKIP variable for possible dry run
-# 
+#
+# Traps worng JQL query and possible corrupted attachment case (not downloading corrupted fileS) 
 # 
 #
 # Python V2
@@ -157,23 +156,38 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 
                 for attachment in issue.fields.attachment:
                      logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
-                     item = attachment.get()    
-                     jira_filename = attachment.filename   
-                     path=os.path.join(DIR,KEY,jira_filename) 
+                     item=""
+                     try:
+                         item = attachment.get()
+                         
+                         jira_filename = attachment.filename   
+                         path=os.path.join(DIR,KEY,jira_filename) 
                      
-                     if (SKIP==0):
-                         with open(path, 'wb') as file:        
-                             file.write(item) 
-                     else:
-                        logging.info("!!! SIMULATED EXECUTION ONLY!!!")
-                     logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename)) 
+                         if (SKIP==0):
+                        
+                            with open(path, 'wb') as file:        
+                                file.write(item)
+                        
+                         else:
+                             logging.info("!!! SIMULATED EXECUTION ONLY!!!")
+                         logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename)) 
+                          
+                     except Exception as error:
+                               logging.error("*******************************************************************************************************************")
+                               logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(error.status_code,error.text))         
+                               logging.error("POSSIBLE CORRUPTED ATTACHEMENT:{0}. NOT DOWNLOADED".format(attachment))
+                               logging.error("*******************************************************************************************************************")
+                    
                 
                 i=i+1
                 logging.debug("---------------------------------------------------------------")
+    
     except JIRAError as e: 
-        logging.error(" ********** JIRA ERROR DETECTED: ***********")
-        logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))
-        logging.error(" ********** Maybe it's the JQL query:  {0}".format(JQL))
+            logging.error(" ********** JIRA ERROR DETECTED: ***********")
+            logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(e.status_code,e.text))
+            logging.error(" ********** Maybe it's the JQL query:  {0}".format(JQL))
+            if (e.status_code==400):
+                logging.error("400 error dedected") 
     else:
         logging.info("All OK")
   
