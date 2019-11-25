@@ -6,6 +6,13 @@ Fetches given Jira JQL query (matching) issues' attachments to given directory
 
 
 
+Traps error cases
+
+1) JQL error
+
+2) Corrupted attachment (skips downloading)
+
+
 
 ##USAGE:
 
@@ -37,4 +44,4 @@ GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP 
 GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP and attachments is NOT EMPTY" -d .
   
 
-Python V2
+Uses Python V2
