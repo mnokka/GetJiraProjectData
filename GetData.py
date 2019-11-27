@@ -27,6 +27,7 @@ import time
 import unidecode
 from jira import JIRA, JIRAError
 from collections import defaultdict
+from time import sleep
 
 start = time.clock()
 __version__ = u"0.1"
@@ -121,7 +122,18 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
     i=1      
     #SKIP --> DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
     try:
+        
+        #haku=jira.search_issues(JQL, fields="attachment", maxResults=2000)
+        #logging.info("JQL haku:{0}".format(haku))
+        
+        #sys.exit(5)
+        
         for issue in jira.search_issues(JQL, fields="attachment", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
+                #sleep(0.5)
+
+                logging.debug("JQL QUERY:{0}".format(JQL))
+                logging.debug("  issue.fields.attachment:{0}".format(issue.fields.attachment))
+            
 
                 logging.info("....... COUNTER:{0}...................................................................................".format(i))
                 #TODO:BUG: if more than one match will fail
@@ -154,17 +166,22 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 else:    
                     logging.info("Directory:{0} exists. DID NOTHING".format(KEY))
                 
-                for attachment in issue.fields.attachment:
+                sikaissue = jira.issue(issue, expand="attachment") # worked originally also using just issue (not expanding)
+                for attachment in sikaissue.fields.attachment:
                      logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
                      item=""
                      try:
-                         item = attachment.get()
                          
+                         kissa=jira.attachment(attachment.id)
+                         #logging.info("kissa:{0}".format(kissa))
+                         #item = attachment.get() # worked originally
+                         item = kissa.get()
+                         
+                         #logging.info("item:{0}".format(item))
                          jira_filename = attachment.filename   
                          path=os.path.join(DIR,KEY,jira_filename) 
                      
                          if (SKIP==0):
-                        
                             with open(path, 'wb') as file:        
                                 file.write(item)
                         

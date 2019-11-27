@@ -44,4 +44,10 @@ GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP 
 GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "project=TOP and attachments is NOT EMPTY" -d .
   
 
+
+If case of complicated JQL queries (like issutype="xxx" using internal " markins), create first filter in Jira and give it as parameter to tool, like:
+GetData.py -u MYUSERNAME -w MYPASSWORD -s https://MYOWNJIRA.fi/ -q "filter=XXXXX" -d .       (XXXX is filter ID number , visible in Jira UI)
+
+
+
 Uses Python V2
