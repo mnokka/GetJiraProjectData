@@ -2,7 +2,7 @@
 
 
 
-Fetches given Jira JQL query (matching) issues' attachments to given directory
+Fetches given Jira JQL query (matching) issues' and subtasks' attachments to given directory. 
 
 
 
