@@ -28,6 +28,7 @@ import unidecode
 from jira import JIRA, JIRAError
 from collections import defaultdict
 from time import sleep
+import keyboard
 
 start = time.clock()
 __version__ = u"0.1"
@@ -36,7 +37,7 @@ __version__ = u"0.1"
 #ENV="demo"
 ENV=u"PROD"
 
-logging.basicConfig(level=logging.INFO) # IF calling from Groovy, this must be set logging level DEBUG in Groovy side order these to be written out
+logging.basicConfig(level=logging.DEBUG) # IF calling from Groovy, this must be set logging level DEBUG in Groovy side order these to be written out
 
 
 
@@ -128,7 +129,11 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
         
         #sys.exit(5)
         
-        for issue in jira.search_issues(JQL, fields="attachment", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
+        for issue in jira.search_issues(JQL, fields="attachment,issuetype", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
+            
+                if (keyboard.is_pressed("x")):
+                   logging.debug("x pressed, stopping now")
+                   break
                 #sleep(0.5)
 
                 logging.debug("JQL QUERY:{0}".format(JQL))
@@ -139,7 +144,31 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 #TODO:BUG: if more than one match will fail
                 myissuekey=format(issue.key)
                 logging.info("Jira issue:{0}".format(myissuekey))
+                #logging.debug("issue.fields.subtasks:{0}".format(issue.fields.subtasks))
+                #logging.debug("issue.fields:{0}".format(issue.fields))
+                #id=jira.issue.id
+                #type=jira.issue_type(issue)
+                #try:
+                issuetype=issue.fields.issuetype
+                logging.debug("issuetype:{0}".format(issuetype))
+               
                 
+                #try
+                if (str(issuetype)=="Task"):
+                    logging.debug("----> TASK")
+                elif (str(issuetype)=="Sub-task"):
+                    logging.debug("----> SUBTASK")
+                else:
+                    logging.debug("----> UNKNOWN ISSUETYPE")
+                
+                #except AttributeError:
+                #   logging.debug("attribute error")
+                
+                #logging.debug("issue.fields.parent:{0}".format(issue.fields.parent))
+                #issue.fields.parent
+                #for subtasks in issue.fields.subtasks:
+                #    logging.debug("issue.fields.subtasks:{0}".format(subtasks))
+                    
                 # TODO: IF field info is needed to find out
                 #logging.debug("ISSUE: {0}:".format(issue))
                 #logging.debug("ID{0}: ".format(issue.id))
@@ -176,7 +205,8 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                          #logging.info("kissa:{0}".format(kissa))
                          #item = attachment.get() # worked originally
                          item = kissa.get()
-                         
+                        
+                        
                          #logging.info("item:{0}".format(item))
                          jira_filename = attachment.filename   
                          path=os.path.join(DIR,KEY,jira_filename) 
