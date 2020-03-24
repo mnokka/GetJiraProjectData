@@ -129,7 +129,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
         
         #sys.exit(5)
         
-        for issue in jira.search_issues(JQL, fields="attachment,issuetype", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
+        for issue in jira.search_issues(JQL, fields="attachment,issuetype,parent", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
             
                 if (keyboard.is_pressed("x")):
                    logging.debug("x pressed, stopping now")
@@ -156,10 +156,24 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 #try
                 if (str(issuetype)=="Task"):
                     logging.debug("----> TASK")
+                    KEY=str(issue.key)
+                    path=os.path.join(DIR,KEY)
+                    
                 elif (str(issuetype)=="Sub-task"):
                     logging.debug("----> SUBTASK")
+                    parent=str(issue.fields.parent)
+                    logging.debug("================> PARENT:{0}".format(parent))
+                    KEY=str(issue.key)
+                    PATHADDITION=parent+"--"+KEY
+                    path=os.path.join(DIR,PATHADDITION)
                 else:
                     logging.debug("----> UNKNOWN ISSUETYPE")
+                
+                
+                
+                finalpath=path
+                logging.debug("final path1:{0}".format(finalpath))
+                
                 
                 #except AttributeError:
                 #   logging.debug("attribute error")
@@ -181,14 +195,15 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 #       logging.debug("field: {0} Value: {1} ".format(field_name,value))
                 
                 
-                KEY=str(issue.key)
-                path=os.path.join(DIR,KEY)
+                # KEY=str(issue.key)
+                # path=os.path.join(DIR,KEY)
                 #logging.info("--> path:{0}".format(path))
            
                 # Create target Directory if don't exist
-                if not os.path.exists(path=os.path.join(DIR,KEY)):
+                if not os.path.exists(path=os.path.join(finalpath,KEY)):
+                    
                     if (SKIP==0):
-                        os.mkdir(path)
+                        os.mkdir(finalpath)
                     else:
                         logging.info("!!! SIMULATED EXECUTION ONLY!!!")
                     logging.info("Created directory:{0}".format(KEY))
@@ -202,26 +217,32 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                      try:
                          
                          kissa=jira.attachment(attachment.id)
-                         #logging.info("kissa:{0}".format(kissa))
+                         #logging.info("attachemnet:{0}".format(kissa))
                          #item = attachment.get() # worked originally
                          item = kissa.get()
                         
                         
                          #logging.info("item:{0}".format(item))
                          jira_filename = attachment.filename   
-                         path=os.path.join(DIR,KEY,jira_filename) 
+                         finalpath=os.path.join(finalpath,jira_filename) 
+                         logging.info("finalpath:{0}".format(finalpath))
+                     
                      
                          if (SKIP==0):
-                            with open(path, 'wb') as file:        
+                            logging.info("GOING TO WRITE")
+                            with open(finalpath, 'wb') as file:
+                                logging.info("WRITING")
                                 file.write(item)
                         
                          else:
                              logging.info("!!! SIMULATED EXECUTION ONLY!!!")
-                         logging.info("Writing directory:{0} File:{1} ".format(path,jira_filename)) 
+                         
+                         logging.info("Writing directory:{0} File:{1} ".format(finalpath,jira_filename)) 
                           
                      except Exception as error:
                                logging.error("*******************************************************************************************************************")
-                               logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(error.status_code,error.text))         
+                               #logging.error(" ********** Statuscode:{0}    Statustext:{1} ************".format(error.status_code,error.text)) 
+                               logging.error(" ********** Error:{0}  ************".format(error))        
                                logging.error("POSSIBLE CORRUPTED ATTACHEMENT:{0}. NOT DOWNLOADED".format(attachment))
                                logging.error("*******************************************************************************************************************")
                     
