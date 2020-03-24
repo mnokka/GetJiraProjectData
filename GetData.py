@@ -129,7 +129,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
         
         #sys.exit(5)
         
-        for issue in jira.search_issues(JQL, fields="attachment,issuetype,parent", maxResults=2000): # TODO: MAX ISSUE AN AN ARGUMENT
+        for issue in jira.search_issues(JQL, fields="attachment,issuetype,parent", maxResults=6000): # TODO: MAX ISSUE AN AN ARGUMENT
             
                 if (keyboard.is_pressed("x")):
                    logging.debug("x pressed, stopping now")
@@ -154,12 +154,12 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                
                 
                 #try
-                if (str(issuetype)=="Task" or str(issuetype)=="Drawings for Approval" or  str(issuetype)=="DD Drawings for Approval"):
+                if (str(issuetype)=="Task" or str(issuetype)=="Drawings for Approval" or  str(issuetype)=="DD Drawings for Approval"  or  str(issuetype)=="Maker for Approval" or  str(issuetype)=="Factory Test Inspection" or  str(issuetype)=="Hull Inspection" or  str(issuetype)=="Outfitting Inspection"  or  str(issuetype)=="Hull Remark"  or  str(issuetype)=="Patrol Survey Inspection"):
                     logging.debug("----> TASK")
                     KEY=str(issue.key)
                     path=os.path.join(DIR,KEY)
                     
-                elif (str(issuetype)=="Sub-task" or str(issuetype)=="Drawings for Approval Remark" or str(issuetype)=="DD Drawings for Approval Remark"):
+                elif (str(issuetype)=="Sub-task" or str(issuetype)=="Drawings for Approval Remark" or str(issuetype)=="DD Drawings for Approval Remark" or str(issuetype)=="Maker for Approval Remark" or str(issuetype)=="Factory Test Remark" or str(issuetype)=="Hull Remark" or str(issuetype)=="Patrol Survey Remark" or str(issuetype)=="Outfitting Remark" ):
                     logging.debug("----> SUBTASK")
                     parent=str(issue.fields.parent)
                     logging.debug("================> PARENT:{0}".format(parent))
