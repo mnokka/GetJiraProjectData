@@ -6,8 +6,9 @@ Fetches given Jira JQL query (matching) issues' and subtasks' attachments to giv
 
 Directory format:
 
-<dirpath>/MAINTASK-nnn/all attachments
-<dirpath>/MAINTASK-nnn--SUBTASK-zzz/ all attachments
+<dirpath>/MAINTASK-nnn/all nnn attachments
+  
+<dirpath>/MAINTASK-nnn--SUBTASK-zzz/ all zzz attachments
 
 
 Traps error cases
