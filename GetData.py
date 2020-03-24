@@ -154,12 +154,12 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                
                 
                 #try
-                if (str(issuetype)=="Task"):
+                if (str(issuetype)=="Task" or str(issuetype)=="Drawings for Approval" or  str(issuetype)=="DD Drawings for Approval"):
                     logging.debug("----> TASK")
                     KEY=str(issue.key)
                     path=os.path.join(DIR,KEY)
                     
-                elif (str(issuetype)=="Sub-task"):
+                elif (str(issuetype)=="Sub-task" or str(issuetype)=="Drawings for Approval Remark" or str(issuetype)=="DD Drawings for Approval Remark"):
                     logging.debug("----> SUBTASK")
                     parent=str(issue.fields.parent)
                     logging.debug("================> PARENT:{0}".format(parent))
@@ -168,7 +168,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                     path=os.path.join(DIR,PATHADDITION)
                 else:
                     logging.debug("----> UNKNOWN ISSUETYPE")
-                
+                    path="I_WILL_FAIL"
                 
                 
                 finalpath=path
@@ -212,7 +212,8 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                 
                 sikaissue = jira.issue(issue, expand="attachment") # worked originally also using just issue (not expanding)
                 for attachment in sikaissue.fields.attachment:
-                     logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=attachment.filename, size=attachment.size,ID=attachment.id))
+                     filenames=attachment.filename.encode('utf-8')
+                     logging.info("Attachment name: '{filename}', size: {size} ID:{ID}".format(filename=filenames, size=attachment.size,ID=attachment.id))
                      item=""
                      try:
                          
@@ -223,7 +224,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                         
                         
                          #logging.info("item:{0}".format(item))
-                         jira_filename = attachment.filename   
+                         jira_filename = filenames  
                          namedpath=os.path.join(finalpath,jira_filename) 
                          logging.info("namedpath:{0}".format(namedpath))
                      
