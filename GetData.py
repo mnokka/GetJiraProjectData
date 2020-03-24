@@ -206,7 +206,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                         os.mkdir(finalpath)
                     else:
                         logging.info("!!! SIMULATED EXECUTION ONLY!!!")
-                    logging.info("Created directory:{0}".format(KEY))
+                    logging.info("Created directory:{0}".format(finalpath))
                 else:    
                     logging.info("Directory:{0} exists. DID NOTHING".format(KEY))
                 
@@ -224,13 +224,13 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                         
                          #logging.info("item:{0}".format(item))
                          jira_filename = attachment.filename   
-                         finalpath=os.path.join(finalpath,jira_filename) 
-                         logging.info("finalpath:{0}".format(finalpath))
+                         namedpath=os.path.join(finalpath,jira_filename) 
+                         logging.info("namedpath:{0}".format(namedpath))
                      
                      
                          if (SKIP==0):
                             logging.info("GOING TO WRITE")
-                            with open(finalpath, 'wb') as file:
+                            with open(namedpath, 'wb') as file:
                                 logging.info("WRITING")
                                 file.write(item)
                         
