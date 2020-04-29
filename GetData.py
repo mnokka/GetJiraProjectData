@@ -29,7 +29,7 @@ from jira import JIRA, JIRAError
 from collections import defaultdict
 from time import sleep
 import keyboard
-
+import math
 
 start = time.clock()
 __version__ = u"0.1"
@@ -125,13 +125,41 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
     #SKIP --> DRYRUN=1 , real operation =0, TODO AS AN ARGUMENT
     try:
         
-        #haku=jira.search_issues(JQL, fields="attachment", maxResults=2000)
-        #logging.info("JQL haku:{0}".format(haku))
+        
+        # atlassian done 100 issue fetch restrcitions
+        haku=jira.search_issues(JQL,startAt=0,maxResults=100,fields="attachment,issuetype,parent", validate_query=True)
+        amount=haku.total
+        logging.info("Total amount of issues found for JQL:{0}".format(amount))
+        logging.info("JQL first 100 issue results:{0}".format(haku))
+        rounds=math.ceil(amount/99)+1
+        logging.info("Fetch rounds needed:{0}".format(rounds))
+        
+        logging.info("---- Fetching Issues for JQL in blocks of 100 for each query (Atlassin bug...)------")
+        TOTALFETCH=[]
+        TOTALS=amount
+        STARTINDEX=0
+        GOGO=True
+        ROUND=1
+        while GOGO:
+            BLOCKFETCH=jira.search_issues(JQL,startAt=STARTINDEX,maxResults=100,fields="attachment,issuetype,parent", validate_query=True)
+            logging.info("ROUND:{0} BLOCKFETCH:{1}".format(ROUND,BLOCKFETCH))
+            TOTALFETCH.extend(BLOCKFETCH)
+            STARTINDEX=STARTINDEX+100
+            if (len(BLOCKFETCH)==0):
+                GOGO=False
+                break
+            ROUND=ROUND+1
+        TOTALLEN=len(TOTALFETCH)   
+        logging.info("TOTALLEN:{0}".format(TOTALLEN))
+        logging.info("TOTALFETCH:{0}".format(TOTALFETCH))
+        
+        logging.info("---- Starting fetching issue data now ------")
         
         #sys.exit(5)
         
-        for issue in jira.search_issues(JQL, fields="attachment,issuetype,parent", maxResults=6000): # TODO: MAX ISSUE AN AN ARGUMENT
-            
+        #for issue in jira.search_issues(JQL, fields="attachment,issuetype,parent", maxResults=6000): # TODO: MAX ISSUE AN AN ARGUMENT
+        
+        for issue in TOTALFETCH:    
                 if (keyboard.is_pressed("x")):
                    logging.debug("x pressed, stopping now")
                    break
