@@ -30,6 +30,7 @@ from collections import defaultdict
 from time import sleep
 import keyboard
 
+
 start = time.clock()
 __version__ = u"0.1"
 
@@ -228,6 +229,18 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                          namedpath=os.path.join(finalpath,jira_filename) 
                          logging.info("namedpath:{0}".format(namedpath))
                      
+                         if os.path.exists(namedpath): 
+                             logging.info("WARNING: Target file exists. Doing naming trick")
+                             logging.info("DUPLICATE: ISSUE: {0} ATTACHMENT:{1}  ".format(sikaissue,jira_filename))
+                             timestamp=GetStamp()
+                             stampedname=timestamp+"_"+jira_filename
+                             namedpath=os.path.join(finalpath,stampedname) 
+                             jira_filename=stampedname
+                             logging.info("Time stamped new filename:{0}".format(jira_filename))
+                             logging.info("New namedpath:{0}".format(namedpath))
+                             
+                         else:
+                             logging.info("No target file found . Creating new file")    
                      
                          if (SKIP==0):
                             logging.info("GOING TO WRITE")
@@ -267,12 +280,26 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
        
             
     print ("*************************************************************************")
-        
-
- 
-  
-
     
 logging.debug ("--Python exiting--")
+
+
+
+#############################################
+# Generate timestamp 
+#
+def GetStamp():
+    from datetime import datetime,date
+    
+    hours=str(datetime.today().hour)
+    minutes=str(datetime.today().minute)
+    seconds=str(datetime.today().second)
+    milliseconds=str(datetime.today().microsecond)
+
+    stamp=hours+"_"+minutes+"_"+seconds+"_"+milliseconds
+
+    return stamp
+
+
 if __name__ == "__main__":
     main(sys.argv[1:]) 
