@@ -183,7 +183,7 @@ def Parse(JIRASERVICE,PSWD,USER,ENV,jira,SKIP,JQL,DIR):
                
                 
                 #try
-                if (str(issuetype)=="Task" or str(issuetype)=="Drawings for Approval" or  str(issuetype)=="DD Drawings for Approval"  or  str(issuetype)=="Maker for Approval" or  str(issuetype)=="Factory Test Inspection" or  str(issuetype)=="Hull Inspection" or  str(issuetype)=="Outfitting Inspection"  or  str(issuetype)=="Hull Remark"  or  str(issuetype)=="Patrol Survey Inspection" or  str(issuetype)=="Internal Hull Inspection" or  str(issuetype)=="Outfitting Main Inspection"   ):
+                if (str(issuetype)=="Task" or str(issuetype)=="Drawings for Approval" or  str(issuetype)=="DD Drawings for Approval"  or  str(issuetype)=="Maker for Approval" or  str(issuetype)=="Factory Test Inspection" or  str(issuetype)=="Hull Inspection" or  str(issuetype)=="Outfitting Inspection"  or    str(issuetype)=="Patrol Survey Inspection" or  str(issuetype)=="Internal Hull Inspection" or  str(issuetype)=="Outfitting Main Inspection"   ):
                     logging.debug("----> TASK")
                     KEY=str(issue.key)
                     path=os.path.join(DIR,KEY)
